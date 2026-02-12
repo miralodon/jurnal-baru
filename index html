@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jurnal Si Kecil</title>
+    <style>
+        :root { --pink: #ff758c; --yellow: #ffed66; --blue: #a2d2ff; }
+        body { font-family: 'Comic Sans MS', cursive; background: var(--blue); margin: 0; text-align: center; }
+        .app { background: white; margin: 20px auto; padding: 20px; border-radius: 30px; width: 90%; max-width: 500px; box-shadow: 0 10px 0 #71b1eb; }
+        .emoji-btn { font-size: 50px; border: none; background: none; cursor: pointer; transition: transform 0.2s; }
+        .emoji-btn:hover { transform: scale(1.2); }
+        canvas { border: 2px dashed #ccc; border-radius: 15px; background: #fafafa; touch-action: none; margin-top: 15px; }
+        .btn-clear { background: var(--pink); color: white; border: none; padding: 10px 20px; border-radius: 10px; margin-top: 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="app">
+        <h1>Halo! Bagaimana perasaanmu hari ini?</h1>
+        <div class="emojis">
+            <button class="emoji-btn" onclick="logMood('Senang 🌟')">😊</button>
+            <button class="emoji-btn" onclick="logMood('Sedih 💧')">😢</button>
+            <button class="emoji-btn" onclick="logMood('Marah 🔥')">😡</button>
+            <button class="emoji-btn" onclick="logMood('Gembira 🎉')">🤩</button>
+        </div>
+        <p id="status">Pilih emoji di atas!</p>
+        
+        <hr>
+        <h3>Gambar perasaanmu di sini:</h3>
+        <canvas id="drawCanvas" width="300" height="200"></canvas>
+        <br>
+        <button class="btn-clear" onclick="clearCanvas()">Hapus Gambar</button>
+    </div>
+
+    <script>
+        // Logika Mood
+        function logMood(mood) {
+            document.getElementById('status').innerText = "Wah, hari ini kamu merasa " + mood;
+        }
+
+        // Logika Menggambar (Canvas)
+        const canvas = document.getElementById('drawCanvas');
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
+
+        canvas.addEventListener('mousedown', () => drawing = true);
+        canvas.addEventListener('mouseup', () => { drawing = false; ctx.beginPath(); });
+        canvas.addEventListener('mousemove', draw);
+        
+        // Support Sentuhan HP
+        canvas.addEventListener('touchstart', (e) => { drawing = true; e.preventDefault(); }, {passive: false});
+        canvas.addEventListener('touchend', () => { drawing = false; ctx.beginPath(); });
+        canvas.addEventListener('touchmove', (e) => {
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            draw({ clientX: touch.clientX, clientY: touch.clientY });
+        }, {passive: false});
+
+        function draw(e) {
+            if (!drawing) return;
+            ctx.lineWidth = 5;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = '#ff758c';
+
+            const rect = canvas.getBoundingClientRect();
+            ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+    </script>
+</body>
+</html>
